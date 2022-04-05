@@ -32,8 +32,10 @@ class _MyHomePageState extends State<MyHomePage> {
   final amountController = TextEditingController();
 
   double _amount = 0;
+  double _tipAmount = 0;
   double _totalBill = 0;
-  double _tipPercent = 1.15;
+  double _tipPercent = 0.15;
+  bool _goodService = false;
 
   @override
   Widget build(BuildContext context) {
@@ -46,29 +48,52 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
 
-            Text("Tip Calculator"),
+            Text(
+              "Tip Calculator",
+              style: Theme.of(context).textTheme.headline4,
+            ),
+            // Get bill amount
             Text("Bill Amount"),
             TextField(controller: amountController),
 
+            // Calculate Tip Button
             ElevatedButton(
                 onPressed: ()
                 {
-                  _amount = double.parse(amountController.text);
-
-                  _totalBill = _amount * _tipPercent;
-
+                  setState(() {
+                    _amount = double.parse(amountController.text);
+                    _tipAmount = _amount * _tipPercent;
+                    _totalBill = _amount + _tipAmount;
+                  });
                 },
                 child: Text("Calcuate Tip")
             ),
 
-            Switch(
-                value: false,
-                onChanged: (value) { _tipPercent = 1.20; }
-                ),
-
-            Text("Bill Amount: " + _amount.toStringAsFixed(2)),
-            Text("Tip: " + _amount.toStringAsFixed(2)),
-            Text("Total Bill: " + _totalBill.toStringAsFixed(2)),
+            // Good Service bonus switch
+            Row(
+              children: [
+              Switch(
+                  value: _goodService,
+                  onChanged: (value) {
+                    setState(() {
+                      _goodService = value;
+                      if (_goodService) {
+                        _tipPercent = 0.20;
+                      } else {
+                        _tipPercent = 0.15;
+                      };
+                    });
+                  }
+              ),
+              Text("Good Service?"),
+              ],
+            ),
+            // Display outputs
+            Text("Bill Amount: \$" + _amount.toStringAsFixed(2),),
+            Text("Tip: \$" + _tipAmount.toStringAsFixed(2),
+              style: Theme.of(context).textTheme.headline4,),
+            Text("Total Bill: \$" + _totalBill.toStringAsFixed(2),
+              style: Theme.of(context).textTheme.headline4,),
 
           ],
         ),
